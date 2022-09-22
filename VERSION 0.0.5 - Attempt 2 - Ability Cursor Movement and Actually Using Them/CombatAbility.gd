@@ -9,8 +9,8 @@ var abilityDesc
 
 # RANGE will be set up as an array of Vector2s. The details can be found within the constructor.
 var abilityRange = []
-
-# Figure out Area of Effect - another array of vectors, probably?
+# AoE works the same way.
+var areaOfEffect = []
 
 # After using the ability, how long should it take for the character to act again?
 var t_cooldown
@@ -21,7 +21,7 @@ var t_cooldown
 # Icon, if we want it?
 
 # Ability constructor, called by the relevant PC script to set up the ability.
-func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange = "Self",
+func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange = "Self", abiAOE = "One Tile",
 			abiCooldown = 50):
 	abilityName = abiName
 	abilityDesc = abiDesc
@@ -43,6 +43,12 @@ func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange 
 			abilityRange.append(Vector2(-1,-1))
 			abilityRange.append(Vector2(1,0))
 			abilityRange.append(Vector2(-1,0))
+		"Melee Horizontal": 
+			abilityRange.append(Vector2(1,0))
+			abilityRange.append(Vector2(-1,0))
+		"Melee Vertical":
+			abilityRange.append(Vector2(0,1))
+			abilityRange.append(Vector2(0,-1))
 		"Melee Cardinal":
 			abilityRange.append(Vector2(0,1))
 			abilityRange.append(Vector2(0,-1))
@@ -123,6 +129,52 @@ func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange 
 			abilityRange.append(Vector2(1, 0)) 
 			abilityRange.append(Vector2(-1, 0))
 			abilityRange.append(Vector2(-2, 0)) 
+
+	# Similarly, Area of Effect is an array of Vec2s, representing "spaces relative to the targeting reticle."
+	# For example, an ability can effect only the targeted tile, or a 3x3 square centered on the target...
+	# These ones will also have names, for the same reason.
+	match abiAOE:
+		"One Tile":
+			areaOfEffect.append(Vector2(0,0))
+		"3x3":
+			areaOfEffect.append(Vector2(0,0))
+			areaOfEffect.append(Vector2(0,1))
+			areaOfEffect.append(Vector2(1,1))
+			areaOfEffect.append(Vector2(1,0))
+			areaOfEffect.append(Vector2(1,-1))
+			areaOfEffect.append(Vector2(0,-1))
+			areaOfEffect.append(Vector2(-1,-1))
+			areaOfEffect.append(Vector2(-1,0))
+			areaOfEffect.append(Vector2(-1,1))
+		"3 Column":
+			areaOfEffect.append(Vector2(0,0))
+			areaOfEffect.append(Vector2(0,1))
+			areaOfEffect.append(Vector2(0,-1))
+		"3 Row":
+			areaOfEffect.append(Vector2(0,0))
+			areaOfEffect.append(Vector2(1,0))
+			areaOfEffect.append(Vector2(-1,0))
+		"Small Donut": # Same as 3x3, but it doesn't affect the center tile
+			areaOfEffect.append(Vector2(0,1))
+			areaOfEffect.append(Vector2(1,1))
+			areaOfEffect.append(Vector2(1,0))
+			areaOfEffect.append(Vector2(1,-1))
+			areaOfEffect.append(Vector2(0,-1))
+			areaOfEffect.append(Vector2(-1,-1))
+			areaOfEffect.append(Vector2(-1,0))
+			areaOfEffect.append(Vector2(-1,1))
+		"Plus-Cross":
+			areaOfEffect.append(Vector2(0,0))
+			areaOfEffect.append(Vector2(0,1))
+			areaOfEffect.append(Vector2(0,-1))
+			areaOfEffect.append(Vector2(1,0))
+			areaOfEffect.append(Vector2(-1,0))
+		"X-Cross":
+			areaOfEffect.append(Vector2(0,0))
+			areaOfEffect.append(Vector2(1,1))
+			areaOfEffect.append(Vector2(1,-1))
+			areaOfEffect.append(Vector2(-1,-1))
+			areaOfEffect.append(Vector2(-1,1))
 
 # Called when the node enters the scene tree for the first time.
 #func _ready():

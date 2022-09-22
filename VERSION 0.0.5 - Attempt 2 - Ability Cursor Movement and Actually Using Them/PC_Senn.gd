@@ -5,10 +5,11 @@ var charName = "Senn"
 
 # Set up ability lists and populate them with early-game abilities
 var attackList = [CombatAbility.new("Splintering Blow", "A strike supremely suited for shredding armor and machines.",
-				"Melee"),
+				"Melee", "One Tile"),
 				CombatAbility.new("Wide Hook", "Smash up to three nearby enemies with one nasty blow.", 
-				"Melee Cardinal")]
-var supportList = [CombatAbility.new("Flex", "Pump yourself up to increase attack and defense.")]
+				"Melee Horizontal", "3 Column")]
+var supportList = [CombatAbility.new("Flex", "Pump yourself up to increase attack and defense.",
+				"Self", "One Tile")]
 
 func _init():
 	# Set stats

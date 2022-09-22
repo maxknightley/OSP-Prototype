@@ -5,12 +5,13 @@ var charName = "Baqi"
 
 # Set up ability lists and populate them with early-game abilities
 var attackList = [CombatAbility.new("Quick Slash", "A swift strike of the sword aimed at a nearby enemy.", 
-				"Melee", 20),
+				"Melee", "One Tile", 20),
 				CombatAbility.new("Knight's Lunge", "Thrust your blade at a near-ish enemy. Deals piercing damage.",
-				"Knight", 35),
-				CombatAbility.new("Vent Steam", "Blast all nearby enemies with an oppressive wave of heat."), 15]
+				"Knight", "One Tile", 35),
+				CombatAbility.new("Vent Steam", "Blast all nearby enemies with an oppressive wave of heat.",
+				"Self", "Small Donut", 15)]
 var supportList = [CombatAbility.new("Deep Breathing", "Heal yourself and up your defense at the cost of attack power.",
-				"Self", 30)]
+				"Self", "One Tile", 30)]
 
 func _init():
 	# Set stats

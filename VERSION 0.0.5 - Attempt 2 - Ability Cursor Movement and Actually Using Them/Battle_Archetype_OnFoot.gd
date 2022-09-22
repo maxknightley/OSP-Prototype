@@ -220,8 +220,13 @@ func populateSkillMenus():
 	if supportListSize > 3: $PopupMenuHandler/Support_Menu/S_Skill4.text = activeCharacter.supportList[3].abilityName
 	else: $PopupMenuHandler/Support_Menu/S_Skill4.text = ""
 
-# When an ability selected from the menu, display its range and the targeting reticle.
+# Display the selected ability's range and AoE. Optionally: initialize the targeting reticle.
 func displayAbilityRange(initReticle = false):
+	# Clear out all tiles
+	for xVal in range(6):
+			for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+	
+	# Find the valid tiles in the ability's RANGE.
 	for tile in selectedAbility.abilityRange:
 		# IF that location is WITHIN THE BATTLEFIELD'S BOUNDARIES, highlight it.
 		if ((tile.x + activeCharacter.gridIndex.x >= 0) && 
@@ -238,7 +243,16 @@ func displayAbilityRange(initReticle = false):
 	# even if the reticle has moved.)
 	if initReticle: 
 		reticleLoc = newReticleLoc
-		set_cellv(reticleLoc, 2)
+		# Generic "non-targeting" version of reticle for Donut abilities etc?
+	# Now, mark all tiles in the ability's AREA OF EFFECT.
+	for tile in selectedAbility.areaOfEffect:
+		if ((tile.x + reticleLoc.x >= 0) && 
+			(tile.x + reticleLoc.x <= 5) &&
+			(tile.y + reticleLoc.y >= 0) && 
+			(tile.y + reticleLoc.y <= 5)):
+				if get_cellv(reticleLoc + tile) == 1:
+					set_cellv(reticleLoc + tile, 2)
+				else: set_cellv(reticleLoc + tile, 3)
 
 # This function handles finding a target for an ability, regardless of if it's an attack or support ability.
 # It could also handle item targeting if that ever becomes a going concern.
@@ -284,10 +298,9 @@ func moveTargetingHandler():
 			else:
 				newReticleLoc.x -= 1
 			
-		# If we're here, a valid tile has been found; update reticleLoc and redraw.
-		set_cellv(reticleLoc, 1)
+		# If we're here, a valid tile has been found. Update reticleLoc and redraw range and AOE.
 		reticleLoc = newReticleLoc
-		set_cellv(reticleLoc, 2)
+		displayAbilityRange()
 		# Don't forget to lock down input for a moment.
 		inputLock()
 	# Moving right works the same as moving left, but with some of the signs flipped
@@ -308,9 +321,8 @@ func moveTargetingHandler():
 			else:
 				newReticleLoc.x += 1
 			
-		set_cellv(reticleLoc, 1)
 		reticleLoc = newReticleLoc
-		set_cellv(reticleLoc, 2)
+		displayAbilityRange()
 
 		inputLock()
 	# Up and down are also the same, but with "x" and "y" flipped
@@ -331,9 +343,8 @@ func moveTargetingHandler():
 			else:
 				newReticleLoc.y -= 1
 			
-		set_cellv(reticleLoc, 1)
 		reticleLoc = newReticleLoc
-		set_cellv(reticleLoc, 2)
+		displayAbilityRange()
 
 		inputLock()
 	if Input.is_action_pressed("move_down"):
@@ -353,9 +364,8 @@ func moveTargetingHandler():
 			else:
 				newReticleLoc.y += 1
 			
-		set_cellv(reticleLoc, 1)
 		reticleLoc = newReticleLoc
-		set_cellv(reticleLoc, 2)
+		displayAbilityRange()
 
 		inputLock()
 
@@ -366,7 +376,6 @@ func adjustActionTimer(action_time_value = 15):
 	# Probably encapsulate in its own "adjustActionTimer" setting or something, so you can easily call it
 	# from different methods + slow people down by different amounts
 	activeCharacter.timeToNextTurn += action_time_value
-	print("Active character: " + str(activeCharacter.charName) + ", " + str(activeCharacter.timeToNextTurn))
 	for character in characterArray:
 		# Decrement timeToNextTurn by the speed value.
 		# TO BE ADDED WHEN RELEVANT: Factor in buff/debuff modifiers
@@ -375,6 +384,10 @@ func adjustActionTimer(action_time_value = 15):
 		# Switch over to the character with the lowest wait time.
 		# THIS IS NOT HOW WE WILL DO THINGS IN THE LONG TERM!!
 		if character.timeToNextTurn < activeCharacter.timeToNextTurn: activeCharacter = character
+	
+	# Repopulate abilities
+	print("Active character is now: " + str(activeCharacter.charName) + ", " + str(activeCharacter.timeToNextTurn))
+	populateSkillMenus()
 
 # Set a timer that momentarily prevents the game from receiving input.
 # This is so we don't register repeat inputs from a single keypress.

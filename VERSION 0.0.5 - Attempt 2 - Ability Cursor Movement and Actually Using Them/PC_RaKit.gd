@@ -5,13 +5,11 @@ var charName = "Ra'Kit"
 
 # Set up ability lists and populate them with early-game abilities
 var attackList = [CombatAbility.new("Shrill Trill", "Does a little damage to all nearby enemies and lowers their defense.",
-				"Self", 15),
+				"Self", "Small Donut", 15),
 				CombatAbility.new("Throw Dirt", "Deals minimal damage to an enemy at range. Can inflict Blind.", 
-				"Long Range", 15)]
+				"Long Range", "One Tile", 15)]
 var supportList = [CombatAbility.new("Look Over There!", "The target will step away, but won't take any damage.",
-				"Medium Area", 15),
-				CombatAbility.new(),
-				CombatAbility.new()]
+				"Medium Area", "One Tile", 15)]
 
 func _init():
 	# Set stats
