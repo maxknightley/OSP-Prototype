@@ -1,0 +1,30 @@
+extends PlayerCharacter
+
+var charName = "Ra'Kit"
+# Character class, if you end up with any place to put it
+
+# Set up ability lists and populate them with early-game abilities
+var attackList = [CombatAbility.new("Shrill Trill", "Does a little damage to all nearby enemies and lowers their defense.",
+				"Self", 15),
+				CombatAbility.new("Throw Dirt", "Deals minimal damage to an enemy at range. Can inflict Blind.", 
+				"Long Range", 15)]
+var supportList = [CombatAbility.new("Look Over There!", "The target will step away, but won't take any damage.",
+				"Medium Area", 15),
+				CombatAbility.new(),
+				CombatAbility.new()]
+
+func _init():
+	# Set stats
+	maxHP = 160
+	statusResist = 150
+
+	baseAttack = 4
+	baseDefense = 4
+	baseSpeed = 12
+	# Separate magic stats?
+
+func _ready():
+	pass
+	
+#func _process(delta):
+#	pass
