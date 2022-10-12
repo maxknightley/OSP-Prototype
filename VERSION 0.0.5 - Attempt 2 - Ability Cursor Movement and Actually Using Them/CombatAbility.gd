@@ -16,16 +16,32 @@ var areaOfEffect = []
 var t_cooldown
 # "Charge up" time a la certain abilities in Live a Live?
 
+# Affects damage or healing done by this ability - should generally be a float between 1.0 and 3.0
+var hpFactor
 # Damage types? [Slashing, Piercing, Splintering, Poisonous, Hot, Electric, etc.?]
-# Cooldown, if we need it?
+
 # Icon, if we want it?
+
+# Status effect type + damage, if necessary
+var statusType
+var statusDamage
+
+# Buff/debuff type + power, if necessary
+var buffType
+var buffPercentage
 
 # Ability constructor, called by the relevant PC script to set up the ability.
 func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange = "Self", abiAOE = "One Tile",
-			abiCooldown = 50):
+			abiCooldown = 50, abiHPF = 1.0,
+			abiStatus = "None", abiStatDamage = 0, abiBuff = "None", abiBuffPct = 0):
 	abilityName = abiName
 	abilityDesc = abiDesc
 	t_cooldown = abiCooldown
+	hpFactor = abiHPF
+	statusType = abiStatus
+	statusDamage = abiStatDamage
+	buffType = abiBuff
+	buffPercentage = abiBuffPct
 	
 	# An ability's range is an array of Vector2s, representing "spaces relative to the player."
 	# For example, an ability targeting the player itself would have (0, 0) and that's it.

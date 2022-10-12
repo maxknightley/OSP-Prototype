@@ -9,7 +9,11 @@ var supportList = [CombatAbility.new()]
 func _init():
 	# Set stats
 	maxHP = 80
-	statusResist = 50
+	
+	bleedResist = 50
+	paralResist = 50
+	blindResist = 50
+	sealResist = 50
 
 	baseAttack = 3
 	baseDefense = 2

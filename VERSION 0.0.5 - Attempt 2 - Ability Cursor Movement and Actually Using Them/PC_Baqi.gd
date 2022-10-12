@@ -16,7 +16,11 @@ var supportList = [CombatAbility.new("Deep Breathing", "Heal yourself and up you
 func _init():
 	# Set stats
 	maxHP = 220
-	statusResist = 100
+	
+	bleedResist = 150
+	paralResist = 120
+	blindResist = 75
+	sealResist = 40
 
 	baseAttack = 7
 	baseDefense = 3

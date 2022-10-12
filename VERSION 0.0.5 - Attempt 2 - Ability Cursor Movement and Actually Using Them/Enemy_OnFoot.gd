@@ -23,7 +23,11 @@ var gridIndex
 # Stats; these should be set in the individual enemy classes.
 var maxHP
 var currHP
-var statusResist
+
+var bleedResist
+var paralResist
+var blindResist
+var sealResist
 
 var baseAttack
 var baseDefense

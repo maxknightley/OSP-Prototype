@@ -14,7 +14,11 @@ var supportList = [CombatAbility.new("Flex", "Pump yourself up to increase attac
 func _init():
 	# Set stats
 	maxHP = 240
-	statusResist = 80
+	
+	bleedResist = 60
+	paralResist = 120
+	blindResist = 80
+	sealResist = 150
 
 	baseAttack = 9
 	baseDefense = 9

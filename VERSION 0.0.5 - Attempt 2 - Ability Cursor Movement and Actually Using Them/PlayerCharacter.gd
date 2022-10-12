@@ -20,14 +20,18 @@ var newPosition = Vector2.ZERO
 # (Starting location is decided on a per-battle basis.)
 var gridIndex
 
-# Default stats; these should be set in the individual character classes.
-var maxHP = 100
-var currHP = 100
-var statusResist = 100
+# Stats; these should be set in the individual character classes.
+var maxHP
+var currHP
 
-var baseAttack = 1
-var baseDefense = 1
-var baseSpeed = 5
+var bleedResist
+var paralResist
+var blindResist
+var sealResist
+
+var baseAttack
+var baseDefense
+var baseSpeed
 # Separate magic stats?
 
 # Track time until the character goes next

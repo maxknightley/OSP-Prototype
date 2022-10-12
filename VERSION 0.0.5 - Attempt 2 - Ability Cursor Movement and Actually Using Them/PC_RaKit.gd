@@ -14,7 +14,11 @@ var supportList = [CombatAbility.new("Look Over There!", "The target will step a
 func _init():
 	# Set stats
 	maxHP = 160
-	statusResist = 150
+	
+	bleedResist = 50
+	paralResist = 70
+	blindResist = 100
+	sealResist = 90
 
 	baseAttack = 4
 	baseDefense = 4
