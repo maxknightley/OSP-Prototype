@@ -12,11 +12,19 @@ func _ready():
 	characterArray.append($PC_Baqi)
 	characterArray[0].gridIndex = Vector2.ZERO
 	characterArray.append($PC_RaKit)
-	characterArray[1].gridIndex = Vector2(3,5)
+	characterArray[1].gridIndex = Vector2(3,4)
 	characterArray.append($PC_Senn)
-	characterArray[2].gridIndex = Vector2(5,2)
+	characterArray[2].gridIndex = Vector2(5,5)
 	characterArray.append($NPC_ExEnemy)
 	characterArray[3].gridIndex = Vector2(4,0)
+	
+	# Initialize character HP and status buildup values.
+	for character in characterArray:
+		character.currHP = character.maxHP
+		character.currBleed = 0
+		character.currParal = 0
+		character.currBlind = 0
+		character.currSeal = 0
 	
 	# Initialize timeToNextTurn for all characters, then hand over control to the fastest one.
 	activeCharacter = characterArray[0]

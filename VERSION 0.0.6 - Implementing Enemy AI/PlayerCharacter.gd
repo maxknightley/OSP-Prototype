@@ -1,14 +1,14 @@
-# Generic enemy class for standard battles.
+# Generic player character class.
 # I'm *fairly* sure most methods will be handled here or in Battle scripts;
 # inheritors will mostly just contain info on abilities, animations, et cetera.
 extends Node2D
-class_name EnemyEntity
+class_name PlayerCharacter
 
 # Point to the parent node, i.e. the Battlefield.
 onready var parent = get_parent()
 
-# This class SHOULD behave as an enemy (usually).
-var isEnemy = true
+# This class should NOT behave as an enemy (usually).
+var isEnemy = false
 
 # Create an empty Velocity vector, which defaults to zero.
 # We use this to smoothly move the character across the screen.
@@ -16,28 +16,32 @@ var velocity = Vector2.ZERO
 # TARGET position tracker. Distinct from "position" for the purposes of velocity calculations.
 var newPosition = Vector2.ZERO
 
-# Where is the character on the battlefield grid?
+# Where is the player on the battlefield grid?
 # (Starting location is decided on a per-battle basis.)
 var gridIndex
 
-# Stats; these should be set in the individual enemy classes.
+# Stats; these should be set in the individual character classes.
 var maxHP
 var currHP
 
 var bleedResist
+var currBleed
 var paralResist
+var currParal
 var blindResist
+var currBlind
 var sealResist
+var currSeal
 
 var baseAttack
 var baseDefense
 var baseSpeed
 # Separate magic stats?
 
+# TO BE ADDED WHEN RELEVANT: Buff/debuff modifiers, status effect buildup + management
+
 # Track time until the character goes next
 var timeToNextTurn
-
-# TO BE ADDED WHEN RELEVANT: Buff/debuff modifiers, status effect code
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -55,14 +59,25 @@ func _process(delta):
 	scale.x = scaleFactor
 	scale.y = scaleFactor
 	
-	# BELOW MAY OR MAY NOT CHANGE ONCE ENEMY AI IS DEVELOPED
+	# If player is in the movement phase, determine the player's target position
 	if parent.currentAction == "movement": movementHandler()
 
-# This function is used to figure out where the enemy sprite should be.
-# All of the code is the same as in PlayerCharacter.gd unless otherwise noted.
+# This function is used to figure out where the player sprite should be 
 func movementHandler():
+	# First, determine the target yPosition, and assign newPosition.y accordingly.
+	# We USED to get the raw y-position of the cell and add 32, so that the character would be 
+	# aligned to the *middle* of the cell...
+	# ...but that doesn't work since I changed how y-scaling works.
+	# This Just Works™ so don't worry about it.
 	newPosition.y = (0.75 * parent.map_to_world(gridIndex).y) + 100
 	
+	# X-position is trickier, due to the distortion/perspective of the grid.
+	# I tried a bunch of Math Ways to figure this out, but it never quite worked...
+	# ...So we're going to just assign it based on the individual cell.
+	
+	### NOTE: All of these THEORETICALLY use consistent formulae, but I couldn't get that working.
+	### If we can streamline this to an cell-x-index check and the formulae themselves, we should!
+	### ...But we can figure that out later.
 	match gridIndex:
 		Vector2(0, 0): newPosition.x = 320 # 320 - y * 17.2
 		Vector2(1, 0): newPosition.x = 384 # 384 - y * 11.2
@@ -106,6 +121,10 @@ func movementHandler():
 		Vector2(4, 5): newPosition.x = 628
 		Vector2(5, 5): newPosition.x = 726
 	
+	# Anyway! Now that the new position has been calculated...
+	# Adjust the object's ACTUAL position to match.
+	# Tweens don't work here because those are for *animation frames.*
+	# That means, for smooth movement, we need to calculate velocity instead.
 	var xDifference = newPosition.x - position.x
 	var yDifference = newPosition.y - position.y
 	

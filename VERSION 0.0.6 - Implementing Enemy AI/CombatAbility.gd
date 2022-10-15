@@ -11,12 +11,15 @@ var abilityDesc
 var abilityRange = []
 # AoE works the same way.
 var areaOfEffect = []
+# Does the ability target enemies? Allies? Both?
+var targetsAllies
+var targetsEnemies
 
 # After using the ability, how long should it take for the character to act again?
 var t_cooldown
 # "Charge up" time a la certain abilities in Live a Live?
 
-# Affects damage or healing done by this ability - should generally be a float between 1.0 and 3.0
+# Affects damage or healing done by this ability - should generally be a float between ±1.0 and ±3.0
 var hpFactor
 # Damage types? [Slashing, Piercing, Splintering, Poisonous, Hot, Electric, etc.?]
 
@@ -32,10 +35,12 @@ var buffPercentage
 
 # Ability constructor, called by the relevant PC script to set up the ability.
 func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange = "Self", abiAOE = "One Tile",
-			abiCooldown = 50, abiHPF = 1.0,
+			willTargetAllies = true, willTargetEnemies = true, abiCooldown = 50, abiHPF = -1.0,
 			abiStatus = "None", abiStatDamage = 0, abiBuff = "None", abiBuffPct = 0):
 	abilityName = abiName
 	abilityDesc = abiDesc
+	targetsAllies = willTargetAllies
+	targetsEnemies = willTargetEnemies
 	t_cooldown = abiCooldown
 	hpFactor = abiHPF
 	statusType = abiStatus

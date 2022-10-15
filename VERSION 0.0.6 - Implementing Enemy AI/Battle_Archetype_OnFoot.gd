@@ -23,6 +23,9 @@ var newReticleLoc = Vector2.ZERO
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# Seed the randomizer
+	randomize()
+	
 	currentAction = "movement" # In a fancier version, we might instead set a timer before this kicks in.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -40,8 +43,69 @@ func _process(delta):
 func playerMovementHandler():
 	# DUMMY CODE - PREVENTS ENEMY CHARACTERS FROM ACTING AT ALL - MUST BE CHANGED
 	if activeCharacter.isEnemy:
-		print("The enemy wants to move. Politely asking him to wait...")
-		adjustActionTimer(100)
+		# Check if the enemy has any special skills they can/should use.
+		var enemyAction = activeCharacter.ai_specialSkillReview(characterArray)
+		if enemyAction: pass
+		else: print("No valid special ability found.")
+		
+		# IF NOT: Loop through all regular attacks and use the first valid one.
+		# (Attack priority can thus be altered by reordering them in the enemy script.)
+		enemyAction = activeCharacter.ai_regAttackReview(characterArray)
+		if enemyAction:
+			# Display range of ability, targeting reticle.
+			reticleLoc = enemyAction[1].gridIndex
+			selectedAbility = enemyAction[0]
+			displayAbilityRange(false, true)
+			
+			# Okay now actually use the ability.
+			# This code is all copied from moveTargetingHandler, modified slightly since the player doesn't
+			# input anything.
+			var valid_targets = []
+		
+			# Loop through characterArray, making a note of all valid targets.
+			# (Since this is a regular attack, that will ALWAYS include PCs; it will also include NPCs
+			# if the attack can hit them)
+			for character in characterArray:
+				for tile in selectedAbility.areaOfEffect:
+					if (tile + reticleLoc == character.gridIndex && (not character.isEnemy ||
+						(character.isEnemy && selectedAbility.targetsAllies))): 
+						valid_targets.append(character)
+			
+			# Note that we don't need to confirm if at least one valid target exists - we already did that!
+			
+			# PROPER ANIMATION STUFF WOULD GO HERE IF WE HAD ANY
+			
+			# Apply the effect of the chosen ability to all valid targets
+			# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
+			for target in valid_targets:
+				target.currHP += int(selectedAbility.hpFactor * ((randi() % 16) + 10 + 
+					(activeCharacter.baseAttack * activeCharacter.baseAttack / target.baseDefense)))
+				
+				# Target HP should never exceed their maximum HP
+				if target.currHP > target.maxHP: target.currHP = target.maxHP
+				# If the target's HP goes below zero, they should be killed/KO'd... but we haven't
+				# implemented that, so for now, just use a print function.
+				print(target.charName + " has: " + str(target.currHP) + " HP")
+				if target.currHP < 0: print("They're dead now!")
+			
+			# TO BE DONE: Figure out how to "maintain position" until all animations have played
+			# out. Otherwise, we essentially erase the highlighted tiles right after drawing them.
+			
+			# Erase all highlighted tiles
+			#for xVal in range(6):
+			#	for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+			
+			# Update character's action cooldown and, if necessary, move down the turn order
+			adjustActionTimer(selectedAbility.t_cooldown)
+			
+			# Exit function.
+			return
+		else: print("Can't attack anybody.")
+		
+		# IF NO VALID SPECIAL SKILLS *OR* REGULAR ATTACKS EXIST: The enemy's range is all fucked!
+		# Clearly, they should move.
+		activeCharacter.ai_whereToMove(characterArray)
+		adjustActionTimer(15)
 		return
 		
 	# Draw a "cursor tile" in the player's current position
@@ -221,10 +285,10 @@ func populateSkillMenus():
 	else: $PopupMenuHandler/Support_Menu/S_Skill4.text = ""
 
 # Display the selected ability's range and AoE. Optionally: initialize the targeting reticle.
-func displayAbilityRange(initReticle = false):
+func displayAbilityRange(initReticle = false, overrideTargetTile = false):
 	# Clear out all tiles
 	for xVal in range(6):
-			for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+		for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
 	
 	# Find the valid tiles in the ability's RANGE.
 	for tile in selectedAbility.abilityRange:
@@ -250,7 +314,7 @@ func displayAbilityRange(initReticle = false):
 			(tile.x + reticleLoc.x <= 5) &&
 			(tile.y + reticleLoc.y >= 0) && 
 			(tile.y + reticleLoc.y <= 5)):
-				if get_cellv(reticleLoc + tile) == 1:
+				if get_cellv(reticleLoc + tile) == 1 && not overrideTargetTile:
 					set_cellv(reticleLoc + tile, 2)
 				else: set_cellv(reticleLoc + tile, 3)
 
@@ -368,6 +432,51 @@ func moveTargetingHandler():
 		displayAbilityRange()
 
 		inputLock()
+	# If the player presses the "confirm" key, attempt to use the ability.
+	if Input.is_action_pressed("ui_accept"):
+		var valid_targets = []
+		
+		# Loop through characterArray, making a note of all valid targets
+		for character in characterArray:
+			for tile in selectedAbility.areaOfEffect:
+				if (tile + reticleLoc == character.gridIndex &&
+				   ((selectedAbility.targetsAllies && not character.isEnemy) ||
+					(selectedAbility.targetsEnemies && character.isEnemy))): valid_targets.append(character)
+		
+		# If no valid targets have been found, return.
+		if valid_targets.size() == 0:
+			inputLock()
+			return
+		# Otherwise, confirm the ability and move forward
+		else:
+			### In a full game, you'll want to call player animation code here
+			
+			# Apply the effect of the chosen ability to all valid targets
+			# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
+			for target in valid_targets:
+				target.currHP += int(selectedAbility.hpFactor * ((randi() % 16) + 10 + 
+					(activeCharacter.baseAttack * activeCharacter.baseAttack / target.baseDefense)))
+				
+				# Target HP should never exceed their maximum HP
+				if target.currHP > target.maxHP: target.currHP = target.maxHP
+				# If the target's HP goes below zero, they should be killed/KO'd... but we haven't
+				# implemented that, so for now, just use a print function.
+				print(target.currHP)
+				if target.currHP < 0: print("They're dead now!")
+			
+			# Erase all highlighted tiles
+			for xVal in range(6):
+				for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+			
+			# Update character's action cooldown and, if necessary, move down the turn order
+			adjustActionTimer(selectedAbility.t_cooldown)
+			
+			# Reset the cursor index and location
+			menuCursorIndex = 0
+			
+			# Lock input and switch to the movement phase
+			inputLock()
+			currentAction = "movement"
 
 # Use this method whenever a character acts in order to determine when they get to act next.
 # THIS CODE WILL NEED TO BE REFACTORED AS COMBAT IS REFINED.
@@ -387,7 +496,7 @@ func adjustActionTimer(action_time_value = 15):
 	
 	# Repopulate abilities
 	print("Active character is now: " + str(activeCharacter.charName) + ", " + str(activeCharacter.timeToNextTurn))
-	populateSkillMenus()
+	if not activeCharacter.isEnemy: populateSkillMenus()
 
 # Set a timer that momentarily prevents the game from receiving input.
 # This is so we don't register repeat inputs from a single keypress.
