@@ -29,7 +29,9 @@ func _ready():
 	# Initialize timeToNextTurn for all characters, then hand over control to the fastest one.
 	activeCharacter = characterArray[0]
 	for character in characterArray:
-		character.timeToNextTurn = 100
+		if character.isEnemy: character.timeToNextTurn = 30
+		else: character.timeToNextTurn = 0
+		
 		character.timeToNextTurn -= character.baseSpeed
 		if character.timeToNextTurn < activeCharacter.timeToNextTurn:
 			activeCharacter = character

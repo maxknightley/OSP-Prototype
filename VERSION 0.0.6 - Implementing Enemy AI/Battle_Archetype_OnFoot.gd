@@ -13,6 +13,7 @@ var currentAction
 var characterArray = []
 # Current turn belongs to?
 var activeCharacter
+var lastActivePC = false # Used to ensure that after an enemy "interrupts," control returns to whoever last had it
 
 # When the player selects an ability to use, it's recorded here
 var selectedAbility
@@ -45,82 +46,13 @@ func _process(delta):
 		"support targeting": moveTargetingHandler()
 
 # This function handles moving a PLAYER CHARACTER across the battlefield.
-# IT MAY EVENTUALLY HANDLE ENEMY MOVEMENT AS WELL - FIGURE THAT OUT
 func movementHandler():
+	# If an enemy should act, have it do that, then return to the delta loop.
 	if activeCharacter.isEnemy:
-		# Change "current action" so that this method doesn't get called again next frame.
-		currentAction = "processing"
-		
-		# Check if the enemy has any special skills they can/should use.
-		var enemyAction = activeCharacter.ai_specialSkillReview(characterArray)
-		if enemyAction: pass
-		
-		# IF NOT: Loop through all regular attacks and use the first valid one.
-		# (Attack priority can thus be altered by reordering them in the enemy script.)
-		enemyAction = activeCharacter.ai_regAttackReview(characterArray)
-		if enemyAction:
-			# Display range of ability, targeting reticle.
-			reticleLoc = enemyAction[1].gridIndex
-			selectedAbility = enemyAction[0]
-			displayAbilityRange(false, true)
-			
-			# Okay now actually use the ability.
-			# This code is all copied from moveTargetingHandler, modified slightly since the player doesn't
-			# input anything.
-			var valid_targets = []
-		
-			# Loop through characterArray, making a note of all valid targets.
-			# (Since this is a regular attack, that will ALWAYS include PCs; it will also include NPCs
-			# if the attack can hit them)
-			for character in characterArray:
-				for tile in selectedAbility.areaOfEffect:
-					if (tile + reticleLoc == character.gridIndex && (not character.isEnemy ||
-						(character.isEnemy && selectedAbility.targetsAllies))): 
-						valid_targets.append(character)
-			
-			# Note that we don't need to confirm if at least one valid target exists - we already did that!
-			
-			# Animate the ability. For more complicated animations, we'll probably need to use an
-			# AnimationPlayer node, maybe timers as well.
-			# But for now, we just need a quick default animation, so let's use a hacky solution.
-			var animSprite = activeCharacter.playAnim(selectedAbility.assocAnimation)
-			yield(animSprite, "animation_finished")
-			animSprite.play("default")
-			
-			# Apply the effect of the chosen ability to all valid targets
-			# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
-			for target in valid_targets:
-				target.currHP += int(selectedAbility.hpFactor * ((randi() % 16) + 10 + 
-					(activeCharacter.baseAttack * activeCharacter.baseAttack / target.baseDefense)))
-				
-				# Target HP should never exceed their maximum HP
-				if target.currHP > target.maxHP: target.currHP = target.maxHP
-				# If the target's HP goes below zero, they should be killed/KO'd... but we haven't
-				# implemented that, so for now, just use a print function.
-				print(target.charName + " has: " + str(target.currHP) + " HP")
-				if target.currHP < 0: print("They're dead now!")
-			
-			# TO BE DONE: Figure out how to "maintain position" until all animations have played
-			# out. Otherwise, we essentially erase the highlighted tiles right after drawing them.
-			
-			# Erase all highlighted tiles
-			for xVal in range(6):
-				for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
-			
-			# Update character's action cooldown and, if necessary, move down the turn order
-			adjustActionTimer(selectedAbility.t_cooldown)
-			
-			# Exit function.
-			currentAction = "movement"
-			return
-		
-		# IF NO VALID SPECIAL SKILLS *OR* REGULAR ATTACKS EXIST: The enemy's range is all fucked!
-		# Clearly, they should move.
-		currentAction = "movement"
-		activeCharacter.ai_whereToMove(characterArray)
-		adjustActionTimer(15)
+		enemyActionHandler()
 		return
-		
+	
+	# Otherwise...
 	# Draw a "cursor tile" in the player's current position
 	set_cellv(activeCharacter.gridIndex, 1)
 	# First things first: If they select the ATTACK or SUPPORT menu, end this method and switch phases.
@@ -482,7 +414,7 @@ func moveTargetingHandler():
 				for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
 			
 			# Update character's action cooldown and, if necessary, move down the turn order
-			adjustActionTimer(selectedAbility.t_cooldown)
+			adjustActionTimer(selectedAbility.t_cooldown, true)
 			
 			# Reset the cursor index and location
 			menuCursorIndex = 0
@@ -492,18 +424,101 @@ func moveTargetingHandler():
 			inputLock()
 			currentAction = "movement"
 
+func enemyActionHandler():
+	# Change "current action" so that this method doesn't get called again next frame.
+	currentAction = "processing"
+		
+	# Check if the enemy has any special skills they can/should use.
+	var enemyAction = activeCharacter.ai_specialSkillReview(characterArray)
+	if enemyAction: pass
+		
+	# IF NOT: Loop through all regular attacks and use the first valid one.
+	# (Attack priority can thus be altered by reordering them in the enemy script.)
+	enemyAction = activeCharacter.ai_regAttackReview(characterArray)
+	if enemyAction:
+		# Display range of ability, targeting reticle.
+		reticleLoc = enemyAction[1].gridIndex
+		selectedAbility = enemyAction[0]
+		displayAbilityRange(false, true)
+			
+		# Okay now actually use the ability.
+		# This code is all copied from moveTargetingHandler, modified slightly since the player doesn't
+		# input anything.
+		var valid_targets = []
+		
+		# Loop through characterArray, making a note of all valid targets.
+		# (Since this is a regular attack, that will ALWAYS include PCs; it will also include NPCs
+		# if the attack can hit them)
+		for character in characterArray:
+			for tile in selectedAbility.areaOfEffect:
+				if (tile + reticleLoc == character.gridIndex && (not character.isEnemy ||
+					(character.isEnemy && selectedAbility.targetsAllies))): 
+					valid_targets.append(character)
+			
+		# Note that we don't need to confirm if at least one valid target exists - we already did that!
+		
+		# Animate the ability. For more complicated animations, we'll probably need to use an
+		# AnimationPlayer node, maybe timers as well.
+		# But for now, we just need a quick default animation, so let's use a hacky solution.
+		var animSprite = activeCharacter.playAnim(selectedAbility.assocAnimation)
+		yield(animSprite, "animation_finished")
+		animSprite.play("default")
+			
+		# Apply the effect of the chosen ability to all valid targets
+		# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
+		for target in valid_targets:
+			target.currHP += int(selectedAbility.hpFactor * ((randi() % 16) + 10 + 
+				(activeCharacter.baseAttack * activeCharacter.baseAttack / target.baseDefense)))
+				
+			# Target HP should never exceed their maximum HP
+			if target.currHP > target.maxHP: target.currHP = target.maxHP
+			# If the target's HP goes below zero, they should be killed/KO'd... but we haven't
+			# implemented that, so for now, just use a print function.
+			print(target.charName + " has: " + str(target.currHP) + " HP")
+			if target.currHP < 0: print("They're dead now!")
+		
+		# Erase all highlighted tiles
+		for xVal in range(6):
+			for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+		
+		# Update character's action cooldown and, if necessary, move down the turn order
+		adjustActionTimer(selectedAbility.t_cooldown, true)
+		
+		# Exit function.
+		currentAction = "movement"
+		return
+		
+	# IF NO VALID SPECIAL SKILLS *OR* REGULAR ATTACKS EXIST: The enemy's range is all fucked!
+	# Clearly, they should move.
+	currentAction = "movement"
+	activeCharacter.ai_whereToMove(characterArray)
+	adjustActionTimer(15, true)
+	return
+
 # Use this method whenever a character acts in order to determine when they get to act next.
-# THIS CODE MAY NEED TO BE REFACTORED AS COMBAT IS REFINED.
-func adjustActionTimer(action_time_value = 15):
+func adjustActionTimer(action_time_value = 15, turnCeded = false):
 	activeCharacter.timeToNextTurn += action_time_value
+	
+	# If an enemy called this method & ceded their turn, restore control to the previous PC.
+	if turnCeded && activeCharacter.isEnemy:
+		activeCharacter = lastActivePC
+		lastActivePC = false
+		turnCeded = false # We revert this to "false" because the NEW activeCharacter DID NOT cede their turn.
+	
+	# Loop through all characters and see who's "most due" to act.
 	for character in characterArray:
 		# Decrement timeToNextTurn by the speed value.
 		# TO BE ADDED WHEN RELEVANT: Factor in buff/debuff modifiers
 		character.timeToNextTurn -= character.baseSpeed
 		
-		# Switch over to the character with the lowest wait time.
-		# THIS IS NOT HOW WE WILL DO THINGS IN THE LONG TERM!!
-		if character.timeToNextTurn < activeCharacter.timeToNextTurn: activeCharacter = character
+		# Is this character an enemy, and can they act?
+		if character.isEnemy && character.timeToNextTurn <= 0:
+			lastActivePC = activeCharacter
+			activeCharacter = character
+		# If not: Is this character a PC, can they act, and has the current character ceded their turn?
+		elif (turnCeded && character.timeToNextTurn <= 0 && 
+			character.timeToNextTurn < activeCharacter.timeToNextTurn): 
+			activeCharacter = character
 	
 	# Repopulate abilities
 	print("Active character is now: " + str(activeCharacter.charName) + ", " + str(activeCharacter.timeToNextTurn))
