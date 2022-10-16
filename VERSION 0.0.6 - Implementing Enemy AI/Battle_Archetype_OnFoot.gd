@@ -32,7 +32,7 @@ func _ready():
 func _process(delta):
 	# Register player input based on the current action being taken.
 	match currentAction:
-		"movement": playerMovementHandler()
+		"movement": movementHandler()
 		"attack menu": attackMenuHandler()
 		"support menu": supportMenuHandler()
 		"attack targeting": moveTargetingHandler()
@@ -40,9 +40,11 @@ func _process(delta):
 
 # This function handles moving a PLAYER CHARACTER across the battlefield.
 # IT MAY EVENTUALLY HANDLE ENEMY MOVEMENT AS WELL - FIGURE THAT OUT
-func playerMovementHandler():
-	# DUMMY CODE - PREVENTS ENEMY CHARACTERS FROM ACTING AT ALL - MUST BE CHANGED
+func movementHandler():
 	if activeCharacter.isEnemy:
+		# Change "current action" so that this method doesn't get called again next frame.
+		currentAction = "processing"
+		
 		# Check if the enemy has any special skills they can/should use.
 		var enemyAction = activeCharacter.ai_specialSkillReview(characterArray)
 		if enemyAction: pass
@@ -103,10 +105,12 @@ func playerMovementHandler():
 			adjustActionTimer(selectedAbility.t_cooldown)
 			
 			# Exit function.
+			currentAction = "movement"
 			return
 		
 		# IF NO VALID SPECIAL SKILLS *OR* REGULAR ATTACKS EXIST: The enemy's range is all fucked!
 		# Clearly, they should move.
+		currentAction = "movement"
 		activeCharacter.ai_whereToMove(characterArray)
 		adjustActionTimer(15)
 		return
@@ -482,11 +486,8 @@ func moveTargetingHandler():
 			currentAction = "movement"
 
 # Use this method whenever a character acts in order to determine when they get to act next.
-# THIS CODE WILL NEED TO BE REFACTORED AS COMBAT IS REFINED.
+# THIS CODE MAY NEED TO BE REFACTORED AS COMBAT IS REFINED.
 func adjustActionTimer(action_time_value = 15):
-	# UNFINISHED CODE - TO BE CHANGED - Update timers and change active character as appropriate.
-	# Probably encapsulate in its own "adjustActionTimer" setting or something, so you can easily call it
-	# from different methods + slow people down by different amounts
 	activeCharacter.timeToNextTurn += action_time_value
 	for character in characterArray:
 		# Decrement timeToNextTurn by the speed value.

@@ -60,7 +60,7 @@ func _process(delta):
 	scale.y = scaleFactor
 	
 	# If player is in the movement phase, determine the player's target position
-	if parent.currentAction == "movement": movementHandler()
+	if parent.currentAction == "movement" || parent.currentAction == "processing": movementHandler()
 
 # This function is used to figure out where the player sprite should be 
 func movementHandler():
