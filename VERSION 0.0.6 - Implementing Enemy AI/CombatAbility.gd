@@ -33,9 +33,13 @@ var statusDamage
 var buffType
 var buffPercentage
 
+# Name of the animation to play when this ability is used
+var assocAnimation
+
 # Ability constructor, called by the relevant PC script to set up the ability.
 func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange = "Self", abiAOE = "One Tile",
 			willTargetAllies = true, willTargetEnemies = true, abiCooldown = 50, abiHPF = -1.0,
+			abiAnim = "default",
 			abiStatus = "None", abiStatDamage = 0, abiBuff = "None", abiBuffPct = 0):
 	abilityName = abiName
 	abilityDesc = abiDesc
@@ -43,6 +47,7 @@ func _init(abiName = "Dummy Ability", abiDesc = "Ability Description", abiRange 
 	targetsEnemies = willTargetEnemies
 	t_cooldown = abiCooldown
 	hpFactor = abiHPF
+	assocAnimation = abiAnim
 	statusType = abiStatus
 	statusDamage = abiStatDamage
 	buffType = abiBuff

@@ -179,3 +179,7 @@ func ai_whereToMove(charlist):
 	else:
 		if gridIndex.y > targetCharacter.gridIndex.y: gridIndex.y -= 1
 		else: gridIndex.y +=1
+
+func playAnim(animName):
+	$AnimatedSprite.play(animName)
+	return $AnimatedSprite

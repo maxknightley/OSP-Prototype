@@ -18,9 +18,9 @@ func _init():
 	
 	# Set up and populate ability lists
 	attackList = [CombatAbility.new("Quick Slash", "A swift strike of the sword aimed at a nearby enemy.", 
-				"Melee", "One Tile", false, true, 20, -1.5),
+				"Melee", "One Tile", false, true, 20, -1.5, "attack"),
 				CombatAbility.new("Super Knight's Lunge", "Thrust your blade at a near-ish enemy. Deals piercing damage.",
-				"Knight", "3x3", false, true, 35, -2.0)]
+				"Knight", "3x3", false, true, 35, -2.0, "attack")]
 	specialList = [CombatAbility.new()]
 
 func _ready():

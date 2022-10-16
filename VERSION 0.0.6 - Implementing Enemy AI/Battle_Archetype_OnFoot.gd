@@ -46,7 +46,6 @@ func playerMovementHandler():
 		# Check if the enemy has any special skills they can/should use.
 		var enemyAction = activeCharacter.ai_specialSkillReview(characterArray)
 		if enemyAction: pass
-		else: print("No valid special ability found.")
 		
 		# IF NOT: Loop through all regular attacks and use the first valid one.
 		# (Attack priority can thus be altered by reordering them in the enemy script.)
@@ -73,7 +72,12 @@ func playerMovementHandler():
 			
 			# Note that we don't need to confirm if at least one valid target exists - we already did that!
 			
-			# PROPER ANIMATION STUFF WOULD GO HERE IF WE HAD ANY
+			# Animate the ability. For more complicated animations, we'll probably need to use an
+			# AnimationPlayer node, maybe timers as well.
+			# But for now, we just need a quick default animation, so let's use a hacky solution.
+			var animSprite = activeCharacter.playAnim(selectedAbility.assocAnimation)
+			yield(animSprite, "animation_finished")
+			animSprite.play("default")
 			
 			# Apply the effect of the chosen ability to all valid targets
 			# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
@@ -92,15 +96,14 @@ func playerMovementHandler():
 			# out. Otherwise, we essentially erase the highlighted tiles right after drawing them.
 			
 			# Erase all highlighted tiles
-			#for xVal in range(6):
-			#	for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
+			for xVal in range(6):
+				for yVal in range(6): set_cellv(Vector2(xVal, yVal), 0)
 			
 			# Update character's action cooldown and, if necessary, move down the turn order
 			adjustActionTimer(selectedAbility.t_cooldown)
 			
 			# Exit function.
 			return
-		else: print("Can't attack anybody.")
 		
 		# IF NO VALID SPECIAL SKILLS *OR* REGULAR ATTACKS EXIST: The enemy's range is all fucked!
 		# Clearly, they should move.
