@@ -126,5 +126,6 @@ one_shot = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )
+autoplay = true
 
 [connection signal="timeout" from="MovementCooldown" to="." method="_on_MovementCooldown_timeout"]

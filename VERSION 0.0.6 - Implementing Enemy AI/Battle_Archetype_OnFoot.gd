@@ -30,6 +30,12 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	# Remove any defeated characters from characterArray.
+	for character in characterArray:
+		if character.currHP <= 0: 
+			character.hide()
+			characterArray.erase(character)
+	
 	# Register player input based on the current action being taken.
 	match currentAction:
 		"movement": movementHandler()
@@ -480,6 +486,7 @@ func moveTargetingHandler():
 			
 			# Reset the cursor index and location
 			menuCursorIndex = 0
+			$PopupMenuHandler/SelectionCursor.position = Vector2(47, 63)
 			
 			# Lock input and switch to the movement phase
 			inputLock()
