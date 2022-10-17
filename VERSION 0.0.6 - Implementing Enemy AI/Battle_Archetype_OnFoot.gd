@@ -31,11 +31,30 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	# Remove any defeated characters from characterArray.
+	# TEMPORARY CODE UNTIL PROPER VICTORY/GAME OVER HANDLING IS IMPLEMENTED
+	if currentAction == "victory" || currentAction == "game over": return
+	
+	# Clear out defeated enemies and check victory/failure conditions.
+	# If all enemies have been defeated, the player wins. If all PCs are defeated, the player loses.
+	var enemiesRemaining = false
+	var pcsRemaining = false
+	
 	for character in characterArray:
-		if character.currHP <= 0: 
+		# If an enemy dies, remove them from the battlefield entirely.
+		# (PCs should not be removed, since we might add revival mechanics down the line.)
+		if character.currHP <= 0 && character.isEnemy:
 			character.hide()
 			characterArray.erase(character)
+			
+		if character.isEnemy: enemiesRemaining = true
+		elif character.currHP > 0: pcsRemaining = true
+		
+	if not enemiesRemaining: 
+		print("You win!")
+		currentAction = "victory"
+	elif not pcsRemaining: 
+		print("You lose...")
+		currentAction = "game over"
 	
 	# Register player input based on the current action being taken.
 	match currentAction:
@@ -499,11 +518,13 @@ func enemyActionHandler():
 func adjustActionTimer(action_time_value = 15, turnCeded = false):
 	activeCharacter.timeToNextTurn += action_time_value
 	
-	# If an enemy called this method & ceded their turn, restore control to the previous PC.
+	# If an enemy called this method & ceded their turn, restore control to the previous PC (if they're alive).
 	if turnCeded && activeCharacter.isEnemy:
-		activeCharacter = lastActivePC
-		lastActivePC = false
-		turnCeded = false # We revert this to "false" because the NEW activeCharacter DID NOT cede their turn.
+		if lastActivePC.currHP <= 0: lastActivePC = false
+		else:
+			activeCharacter = lastActivePC
+			lastActivePC = false
+			turnCeded = false # We revert this to "false" because the NEW activeCharacter DID NOT cede their turn.
 	
 	# Loop through all characters and see who's "most due" to act.
 	for character in characterArray:
@@ -516,7 +537,7 @@ func adjustActionTimer(action_time_value = 15, turnCeded = false):
 			lastActivePC = activeCharacter
 			activeCharacter = character
 		# If not: Is this character a PC, can they act, and has the current character ceded their turn?
-		elif (turnCeded && character.timeToNextTurn <= 0 && 
+		elif (turnCeded && character.timeToNextTurn <= 0 && character.currHP > 0 && 
 			character.timeToNextTurn < activeCharacter.timeToNextTurn): 
 			activeCharacter = character
 	
