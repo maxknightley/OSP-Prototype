@@ -77,7 +77,7 @@ func movementHandler():
 	$HPMeter.show()
 	$HPMeterText.show()
 	$ActiveCharacterName.text = activeCharacter.charName
-	$HPMeter.value = activeCharacter.currHP / activeCharacter.maxHP * 100
+	$HPMeter.value = (100 * activeCharacter.currHP) / activeCharacter.maxHP
 	$HPMeterText.text = str(activeCharacter.currHP) + " / " + str(activeCharacter.maxHP)
 	
 	# Draw a "cursor tile" in the player's current position

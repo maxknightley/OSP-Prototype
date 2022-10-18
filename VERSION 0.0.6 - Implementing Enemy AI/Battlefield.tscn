@@ -149,12 +149,13 @@ autoplay = true
 [node name="HPMeter" type="TextureProgress" parent="."]
 margin_left = 825.0
 margin_top = 705.0
-margin_right = 1081.0
-margin_bottom = 961.0
+margin_right = 1023.0
+margin_bottom = 767.0
 step = 0.01
 rounded = true
 texture_under = ExtResource( 8 )
 texture_progress = ExtResource( 9 )
+nine_patch_stretch = true
 
 [node name="HPMeterText" type="Label" parent="."]
 margin_left = 859.0
