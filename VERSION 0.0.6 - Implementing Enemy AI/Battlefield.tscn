@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Assets/tilesmall.png" type="Texture" id=1]
 [ext_resource path="res://Assets/valid_target.tres" type="Texture" id=2]
@@ -6,6 +6,10 @@
 [ext_resource path="res://PopupMenuHandler.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Assets/valid_target_in_aoe.tres" type="Texture" id=5]
 [ext_resource path="res://Assets/indirect_target_in_aoe.tres" type="Texture" id=6]
+[ext_resource path="res://Assets/Fonts/Evil_Empire.tres" type="DynamicFont" id=7]
+[ext_resource path="res://Assets/hp_missing_texture.png" type="Texture" id=8]
+[ext_resource path="res://Assets/hp_present_texture.png" type="Texture" id=9]
+[ext_resource path="res://Assets/menu_theme.tres" type="Theme" id=10]
 
 [sub_resource type="Shader" id=2]
 code = "shader_type canvas_item;
@@ -109,6 +113,20 @@ shader = SubResource( 2 )
 3/shapes = [  ]
 3/z_index = 0
 
+[sub_resource type="Theme" id=5]
+default_font = ExtResource( 7 )
+Label/colors/font_color = Color( 1, 1, 1, 1 )
+Label/colors/font_color_shadow = Color( 0, 0, 0, 1 )
+Label/colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+Label/constants/line_spacing = 0
+Label/constants/shadow_as_outline = 0
+Label/constants/shadow_offset_x = 0
+Label/constants/shadow_offset_y = 0
+Label/fonts/font = ExtResource( 7 )
+Label/styles/normal = null
+TabContainer/constants/label_valign_bg = 0
+TabContainer/constants/label_valign_fg = 0
+
 [node name="Battlefield" type="TileMap"]
 material = SubResource( 3 )
 z_index = -2
@@ -127,5 +145,35 @@ one_shot = true
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )
 autoplay = true
+
+[node name="HPMeter" type="TextureProgress" parent="."]
+margin_left = 825.0
+margin_top = 705.0
+margin_right = 1081.0
+margin_bottom = 961.0
+step = 0.01
+rounded = true
+texture_under = ExtResource( 8 )
+texture_progress = ExtResource( 9 )
+
+[node name="HPMeterText" type="Label" parent="."]
+margin_left = 859.0
+margin_top = 716.0
+margin_right = 999.0
+margin_bottom = 754.0
+theme = ExtResource( 10 )
+text = "foo / bar"
+align = 1
+valign = 1
+
+[node name="ActiveCharacterName" type="Label" parent="."]
+margin_left = 828.0
+margin_top = 657.0
+margin_right = 1005.0
+margin_bottom = 698.0
+theme = SubResource( 5 )
+text = "EX_CHAR"
+align = 2
+valign = 2
 
 [connection signal="timeout" from="MovementCooldown" to="." method="_on_MovementCooldown_timeout"]

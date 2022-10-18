@@ -72,6 +72,14 @@ func movementHandler():
 		return
 	
 	# Otherwise...
+	# Show the character's HP and name in the lower right corner
+	$ActiveCharacterName.show()
+	$HPMeter.show()
+	$HPMeterText.show()
+	$ActiveCharacterName.text = activeCharacter.charName
+	$HPMeter.value = activeCharacter.currHP / activeCharacter.maxHP * 100
+	$HPMeterText.text = str(activeCharacter.currHP) + " / " + str(activeCharacter.maxHP)
+	
 	# Draw a "cursor tile" in the player's current position
 	set_cellv(activeCharacter.gridIndex, 1)
 	# First things first: If they select the ATTACK or SUPPORT menu, end this method and switch phases.
@@ -444,6 +452,11 @@ func moveTargetingHandler():
 			currentAction = "movement"
 
 func enemyActionHandler():
+	# Hide HP meter and character name if they're present
+	$ActiveCharacterName.hide()
+	$HPMeter.hide()
+	$HPMeterText.hide()
+	
 	# Change "current action" so that this method doesn't get called again next frame.
 	currentAction = "processing"
 		
@@ -516,7 +529,7 @@ func enemyActionHandler():
 
 # Use this method whenever a character acts in order to determine when they get to act next.
 func adjustActionTimer(action_time_value = 15, turnCeded = false):
-	activeCharacter.timeToNextTurn += action_time_value
+	activeCharacter.timeToNextTurn = action_time_value
 	
 	# If an enemy called this method & ceded their turn, restore control to the previous PC (if they're alive).
 	if turnCeded && activeCharacter.isEnemy:

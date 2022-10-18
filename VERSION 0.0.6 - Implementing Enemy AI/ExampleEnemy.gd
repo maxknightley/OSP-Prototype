@@ -3,15 +3,15 @@ extends EnemyEntity
 var charName = "Generic Test Enemy"
 
 func _init():
-	# Set stats. Since this is a test enemy, we want it to die quickly and kill quickly, at least for now.
-	maxHP = 1
+	# Set stats. Since this is a test enemy, these are all arbitrary and can be changed based on what we're testing.
+	maxHP = 1500
 	
 	bleedResist = 50
 	paralResist = 50
 	blindResist = 50
 	sealResist = 50
 
-	baseAttack = 500
+	baseAttack = 4
 	baseDefense = 2
 	baseSpeed = 6
 	# Separate magic stats?
