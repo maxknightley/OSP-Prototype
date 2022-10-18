@@ -135,3 +135,7 @@ func movementHandler():
 	else: velocity.y = yDifference / 5
 		
 	position += Vector2(velocity.x, velocity.y)
+
+func playAnim(animName):
+	$AnimatedSprite.play(animName)
+	return $AnimatedSprite

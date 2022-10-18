@@ -23,6 +23,7 @@ var reticleLoc = Vector2.ZERO
 var newReticleLoc = Vector2.ZERO
 
 # Called when the node enters the scene tree for the first time.
+# NOTE: Anything dealing with characterArray should be done in the SPECIFIC battle script, to avoid errors.
 func _ready():
 	# Seed the randomizer
 	randomize()
@@ -42,9 +43,12 @@ func _process(delta):
 	for character in characterArray:
 		# If an enemy dies, remove them from the battlefield entirely.
 		# (PCs should not be removed, since we might add revival mechanics down the line.)
-		if character.currHP <= 0 && character.isEnemy:
-			character.hide()
-			characterArray.erase(character)
+		if character.currHP <= 0:
+			if character.isEnemy:
+				character.hide()
+				characterArray.erase(character)
+			else:
+				character.playAnim("KO")
 			
 		if character.isEnemy: enemiesRemaining = true
 		elif character.currHP > 0: pcsRemaining = true
@@ -555,6 +559,10 @@ func enemyActionHandler():
 		# Apply the effect of the chosen ability to all valid targets
 		# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
 		for target in valid_targets:
+			# If the target is a PC who's already downed, they should be removed from the field.
+			var pcDoubleDowned = false
+			if target.currHP <= 0: pcDoubleDowned = true
+			
 			target.currHP += int(selectedAbility.hpFactor * ((randi() % 16) + 10 + 
 				(activeCharacter.baseAttack * activeCharacter.baseAttack / target.baseDefense)))
 				
@@ -563,7 +571,11 @@ func enemyActionHandler():
 			# If the target's HP goes below zero, they should be killed/KO'd... but we haven't
 			# implemented that, so for now, just use a print function.
 			print(target.charName + " has: " + str(target.currHP) + " HP")
-			if target.currHP < 0: print("They're dead now!")
+			if target.currHP < 0: 
+				print("They're dead now!")
+				if pcDoubleDowned:
+					target.hide()
+					characterArray.erase(target)
 		
 		# Erase all highlighted tiles
 		for xVal in range(6):

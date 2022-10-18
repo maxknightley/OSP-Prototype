@@ -11,7 +11,7 @@ func _init():
 	blindResist = 50
 	sealResist = 50
 
-	baseAttack = 4
+	baseAttack = 100
 	baseDefense = 2
 	baseSpeed = 6
 	# Separate magic stats?

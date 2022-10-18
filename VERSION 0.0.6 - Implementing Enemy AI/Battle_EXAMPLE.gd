@@ -18,8 +18,10 @@ func _ready():
 	characterArray.append($NPC_ExEnemy)
 	characterArray[3].gridIndex = Vector2(4,0)
 	
-	# Initialize character HP and status buildup values.
+	# Initialize character animation state, character HP, and status buildup values.
 	for character in characterArray:
+		character.playAnim("default")
+	
 		character.currHP = character.maxHP
 		character.currBleed = 0
 		character.currParal = 0
