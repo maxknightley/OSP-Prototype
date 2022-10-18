@@ -63,6 +63,7 @@ func _process(delta):
 		"support menu": supportMenuHandler()
 		"attack targeting": moveTargetingHandler()
 		"support targeting": moveTargetingHandler()
+		"checking": checkFieldHandler()
 
 # This function handles moving a PLAYER CHARACTER across the battlefield.
 func movementHandler():
@@ -82,6 +83,7 @@ func movementHandler():
 	
 	# Draw a "cursor tile" in the player's current position
 	set_cellv(activeCharacter.gridIndex, 1)
+	
 	# First things first: If they select the ATTACK or SUPPORT menu, end this method and switch phases.
 	if Input.is_action_pressed("open_attack_menu") && canInput:
 		set_cellv(activeCharacter.gridIndex, 0)
@@ -91,6 +93,7 @@ func movementHandler():
 		$PopupMenuHandler/SelectionCursor.show()
 		$PopupMenuHandler/Attack_Menu.show()
 		inputLock()
+		return
 		
 	elif Input.is_action_pressed("open_support_menu") && canInput:
 		set_cellv(activeCharacter.gridIndex, 0)
@@ -99,6 +102,14 @@ func movementHandler():
 		$PopupMenuHandler/SelectionCursor.show()
 		$PopupMenuHandler/Support_Menu.show()
 		inputLock()
+		return
+	
+	# Same goes for if they try to CHECK the battlefield.
+	elif Input.is_action_pressed("check_battlefield") && canInput:
+		reticleLoc = activeCharacter.gridIndex
+		currentAction = "checking"
+		inputLock()
+		return
 	
 	var activePlayerTargetPosition = activeCharacter.gridIndex
 	
@@ -450,6 +461,51 @@ func moveTargetingHandler():
 			# Lock input and switch to the movement phase
 			inputLock()
 			currentAction = "movement"
+
+# Lets the player check NPCs and other PCs' health and status.
+# Might also be used to check battlefield effects? We'll see.
+func checkFieldHandler():
+	set_cellv(reticleLoc, 3)
+	
+	# Moving the reticle
+	if Input.is_action_pressed("ui_cancel") && canInput:
+		set_cellv(reticleLoc, 0)
+		currentAction = "movement"
+		inputLock()
+	elif Input.is_action_pressed("move_left") && canInput && reticleLoc.x > 0:
+		set_cellv(reticleLoc, 0)
+		reticleLoc.x -= 1
+		inputLock()
+	elif Input.is_action_pressed("move_right") && canInput && reticleLoc.x < 5:
+		set_cellv(reticleLoc, 0)
+		reticleLoc.x += 1
+		inputLock()
+	elif Input.is_action_pressed("move_up") && canInput && reticleLoc.x > 0:
+		set_cellv(reticleLoc, 0)
+		reticleLoc.y -= 1
+		inputLock()
+	elif Input.is_action_pressed("move_down") && canInput && reticleLoc.x < 5:
+		set_cellv(reticleLoc, 0)
+		reticleLoc.y += 1
+		inputLock()
+	
+	# Check which character, if any, is on that tile. Display the matching HP and status info.
+	var characterToDisplay = false
+	for character in characterArray:
+		if character.gridIndex == reticleLoc:
+			characterToDisplay = character
+	
+	if characterToDisplay:
+		$ActiveCharacterName.show()
+		$HPMeter.show()
+		$HPMeterText.show()
+		$ActiveCharacterName.text = characterToDisplay.charName
+		$HPMeter.value = (100 * characterToDisplay.currHP) / characterToDisplay.maxHP
+		$HPMeterText.text = str(characterToDisplay.currHP) + " / " + str(characterToDisplay.maxHP)
+	else:
+		$ActiveCharacterName.hide()
+		$HPMeter.hide()
+		$HPMeterText.hide()
 
 func enemyActionHandler():
 	# Hide HP meter and character name if they're present
