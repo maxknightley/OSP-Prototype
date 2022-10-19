@@ -114,6 +114,13 @@ func movementHandler():
 		currentAction = "checking"
 		inputLock()
 		return
+		
+	# If the player skips their turn, *very slightly* adjust the active PC's action timer and move down the line.
+	elif Input.is_action_pressed("skip_turn") && canInput:
+		inputLock()
+		set_cellv(activeCharacter.gridIndex, 0)
+		adjustActionTimer(activeCharacter.baseSpeed, true)
+		return
 	
 	var activePlayerTargetPosition = activeCharacter.gridIndex
 	
