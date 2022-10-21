@@ -38,8 +38,8 @@ _global_script_class_icons={
 
 [application]
 
-config/name="Combat Greybox - OSP"
-run/main_scene="res://Main.tscn"
+config/name="Greybox Prototype - OSP"
+run/main_scene="res://TestLevel.tscn"
 config/icon="res://icon.png"
 
 [display]
@@ -107,6 +107,11 @@ check_battlefield={
 skip_turn={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":67,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
+ ]
+}
+run={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"physical_scancode":0,"unicode":0,"echo":false,"script":null)
  ]
 }
 
