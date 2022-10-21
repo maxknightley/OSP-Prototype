@@ -16,7 +16,7 @@ func _process(delta):
 		emit_signal("sendTextToDisplay", 
 			["This is a sign!",
 			"By pressing 'Z', you've accessed some GENERIC TEST DIALOGUE.",
-			"I'm still working on getting it all to show up, though..."])
+			"This is the last line - \nbut you can read it again if you like."])
 
 func _on_Sign_body_entered(body):
 	$AnimatedSprite.play("highlighted")

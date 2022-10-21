@@ -11,10 +11,15 @@ script = ExtResource( 2 )
 [node name="Sign" parent="." instance=ExtResource( 3 )]
 position = Vector2( 694, 428 )
 
-[node name="OW_Baqi" parent="." instance=ExtResource( 1 )]
+[node name="OW_Leader" parent="." instance=ExtResource( 1 )]
 position = Vector2( 481, 399 )
 
 [node name="DialogDisplay" parent="." instance=ExtResource( 4 )]
 visible = false
 
+[node name="DialogCooldown" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
 [connection signal="sendTextToDisplay" from="Sign" to="." method="_on_Sign_sendTextToDisplay"]
+[connection signal="timeout" from="DialogCooldown" to="." method="_on_DialogCooldown_timeout"]

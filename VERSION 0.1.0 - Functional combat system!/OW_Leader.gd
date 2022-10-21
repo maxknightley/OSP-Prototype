@@ -2,6 +2,8 @@ extends Node2D
 
 # Velocity of character, used to handle movement across the stage.
 var velocity = Vector2.ZERO
+# Whether the character can move based on player input. Set this to FALSE when cutscenes or dialogue are active.
+var canMove = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,4 +24,4 @@ func _process(delta):
 	if Input.is_action_pressed("run"): velocity.x *= 2.4
 	
 	# Adjust the leader's position.
-	position += velocity
+	if canMove: position += velocity
