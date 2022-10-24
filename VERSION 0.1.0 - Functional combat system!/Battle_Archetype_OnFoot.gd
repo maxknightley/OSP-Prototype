@@ -1,6 +1,11 @@
 extends TileMap
 class_name Encounter_OnFoot
 
+# Signals to transition back to overworld or to a "game over" screen as appropriate
+signal victory(stageID)
+signal gameOver()
+
+var stageID # Used w/ the "victory" signal to ensure proper behavior when returning to the overworld.
 var canInput = true # We'll use this to avoid receiving multiple inputs from a single keypress.
 
 var isFieldCursorVisible = false # Use this to determine when to draw a "target" tile.
@@ -52,10 +57,11 @@ func _process(delta):
 			
 		if character.isEnemy: enemiesRemaining = true
 		elif character.currHP > 0: pcsRemaining = true
-		
+	
+	# If all enemies have been wiped out, emit a signal that transitions us back to the overworld
 	if not enemiesRemaining: 
-		print("You win!")
-		currentAction = "victory"
+		emit_signal("victory", stageID)
+	#####
 	elif not pcsRemaining: 
 		print("You lose...")
 		currentAction = "game over"
@@ -556,7 +562,7 @@ func enemyActionHandler():
 			
 		# Note that we don't need to confirm if at least one valid target exists - we already did that!
 		
-		# Animate the ability. For more complicated animations, we'll probably need to use an
+		# Animate the ability. For more complicated animations, we may need to use an
 		# AnimationPlayer node, maybe timers as well.
 		# But for now, we just need a quick default animation, so let's use a hacky solution.
 		var animSprite = activeCharacter.playAnim(selectedAbility.assocAnimation)

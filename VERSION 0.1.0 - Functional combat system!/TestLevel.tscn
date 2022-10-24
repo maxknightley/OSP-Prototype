@@ -1,25 +1,32 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Overworld_Baqi.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Level.gd" type="Script" id=2]
 [ext_resource path="res://TestSign.tscn" type="PackedScene" id=3]
 [ext_resource path="res://DialogDisplay.tscn" type="PackedScene" id=4]
+[ext_resource path="res://TestFloor.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Assets/Music/Combat Theme 1 - Bleed Red.ogg" type="AudioStream" id=6]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 2 )
 
 [node name="Sign" parent="." instance=ExtResource( 3 )]
-position = Vector2( 694, 428 )
+position = Vector2( 818, 696 )
 
 [node name="OW_Leader" parent="." instance=ExtResource( 1 )]
-position = Vector2( 481, 399 )
+position = Vector2( 524, 403 )
 
 [node name="DialogDisplay" parent="." instance=ExtResource( 4 )]
-visible = false
 
 [node name="DialogCooldown" type="Timer" parent="."]
 wait_time = 0.2
 one_shot = true
+
+[node name="TestFloor" parent="." instance=ExtResource( 5 )]
+position = Vector2( 522, 733 )
+
+[node name="CombatThemePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
 
 [connection signal="sendTextToDisplay" from="Sign" to="." method="_on_Sign_sendTextToDisplay"]
 [connection signal="timeout" from="DialogCooldown" to="." method="_on_DialogCooldown_timeout"]

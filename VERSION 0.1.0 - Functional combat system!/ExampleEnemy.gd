@@ -4,14 +4,14 @@ var charName = "Generic Test Enemy"
 
 func _init():
 	# Set stats. Since this is a test enemy, these are all arbitrary and can be changed based on what we're testing.
-	maxHP = 1500
+	maxHP = 1
 	
 	bleedResist = 50
 	paralResist = 50
 	blindResist = 50
 	sealResist = 50
 
-	baseAttack = 100
+	baseAttack = 200
 	baseDefense = 2
 	baseSpeed = 6
 	# Separate magic stats?

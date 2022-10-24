@@ -1,8 +1,7 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Assets/tilesmall.png" type="Texture" id=1]
 [ext_resource path="res://Assets/valid_target.tres" type="Texture" id=2]
-[ext_resource path="res://Assets/Music/Combat Theme 1 - Bleed Red.ogg" type="AudioStream" id=3]
 [ext_resource path="res://PopupMenuHandler.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Assets/valid_target_in_aoe.tres" type="Texture" id=5]
 [ext_resource path="res://Assets/indirect_target_in_aoe.tres" type="Texture" id=6]
@@ -141,10 +140,6 @@ wait_time = 0.28
 one_shot = true
 
 [node name="PopupMenuHandler" parent="." instance=ExtResource( 4 )]
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 3 )
-autoplay = true
 
 [node name="HPMeter" type="TextureProgress" parent="."]
 margin_left = 825.0

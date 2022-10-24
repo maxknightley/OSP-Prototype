@@ -3,15 +3,26 @@
 [ext_resource path="res://Assets/menu_theme.tres" type="Theme" id=1]
 
 [node name="DialogDisplay" type="Node2D"]
+position = Vector2( -1, 0 )
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="TalkspritesFG" type="CanvasLayer" parent="."]
+
+[node name="TalkspriteLeftF" type="Sprite" parent="TalkspritesFG"]
+position = Vector2( 172, 390 )
+
+[node name="TalkspriteRightF" type="Sprite" parent="TalkspritesFG"]
+position = Vector2( 847, 390 )
+
+[node name="DialogBox" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="DialogBox"]
 margin_left = 30.0
 margin_top = 548.0
 margin_right = 994.0
 margin_bottom = 738.0
-color = Color( 0.207843, 0.203922, 0.262745, 1 )
+color = Color( 0.207843, 0.203922, 0.262745, 0.745098 )
 
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
+[node name="RichTextLabel" type="RichTextLabel" parent="DialogBox"]
 margin_left = 50.0
 margin_top = 565.0
 margin_right = 975.0
