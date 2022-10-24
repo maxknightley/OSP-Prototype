@@ -569,7 +569,7 @@ func enemyActionHandler():
 		animSprite.play("default")
 			
 		# Apply the effect of the chosen ability to all valid targets
-		# DOES NOT YET FACTOR IN BUFFS/DEBUFFS
+		# TBD WHEN RELEVANT - FACTOR IN BUFFS/DEBUFFS
 		for target in valid_targets:
 			# If the target is a PC who's already downed, they should be removed from the field.
 			var pcDoubleDowned = false
@@ -622,11 +622,11 @@ func adjustActionTimer(action_time_value = 15, turnCeded = false):
 	# Loop through all characters and see who's "most due" to act.
 	for character in characterArray:
 		# Decrement timeToNextTurn by the speed value.
-		# TO BE ADDED WHEN RELEVANT: Factor in buff/debuff modifiers
+		# TBD WHEN RELEVANT: Factor in buff/debuff modifiers
 		character.timeToNextTurn -= character.baseSpeed
 		
 		# Is this character an enemy, and can they act?
-		if character.isEnemy && character.timeToNextTurn <= 0:
+		if character.isEnemy && character.timeToNextTurn <= 0 && character.currHP > 0:
 			lastActivePC = activeCharacter
 			activeCharacter = character
 		# If not: Is this character a PC, can they act, and has the current character ceded their turn?
