@@ -36,7 +36,7 @@ func _ready():
 	currentAction = "movement" # In a fancier version, we might instead set a timer before this kicks in.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	# TEMPORARY CODE UNTIL PROPER VICTORY/GAME OVER HANDLING IS IMPLEMENTED
 	if currentAction == "victory" || currentAction == "game over": return
 	
@@ -99,7 +99,6 @@ func movementHandler():
 		set_cellv(activeCharacter.gridIndex, 0)
 		currentAction = "attack menu"
 		# Display the cursor and the attack-skill menu.
-		# TBD? - move this to a PopupMenuHandler script and get it all nicely encapsulated
 		$PopupMenuHandler/SelectionCursor.show()
 		$PopupMenuHandler/Attack_Menu.show()
 		inputLock()

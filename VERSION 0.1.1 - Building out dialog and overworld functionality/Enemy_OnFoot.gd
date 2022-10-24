@@ -1,14 +1,14 @@
-# Generic player character class.
+# Generic enemy class for standard battles.
 # I'm *fairly* sure most methods will be handled here or in Battle scripts;
 # inheritors will mostly just contain info on abilities, animations, et cetera.
 extends Node2D
-class_name PlayerCharacter
+class_name EnemyEntity
 
 # Point to the parent node, i.e. the Battlefield.
 onready var parent = get_parent()
 
-# This class should NOT behave as an enemy (usually).
-var isEnemy = false
+# This class SHOULD behave as an enemy (usually).
+var isEnemy = true
 
 # Create an empty Velocity vector, which defaults to zero.
 # We use this to smoothly move the character across the screen.
@@ -16,11 +16,11 @@ var velocity = Vector2.ZERO
 # TARGET position tracker. Distinct from "position" for the purposes of velocity calculations.
 var newPosition = Vector2.ZERO
 
-# Where is the player on the battlefield grid?
+# Where is the character on the battlefield grid?
 # (Starting location is decided on a per-battle basis.)
 var gridIndex
 
-# Stats; these should be set in the individual character classes.
+# Stats; these should be set in the individual enemy classes.
 var maxHP
 var currHP
 
@@ -38,7 +38,11 @@ var baseDefense
 var baseSpeed
 # Separate magic stats?
 
-# TO BE ADDED WHEN RELEVANT: Buff/debuff modifiers, status effect buildup + management
+# TO BE ADDED WHEN RELEVANT: Buff/debuff modifiers
+
+# Lists of skills - separated into "special" abilities + regular attacks
+var attackList
+var specialList
 
 # Track time until the character goes next
 var timeToNextTurn
@@ -48,7 +52,7 @@ func _ready():
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	# Ensure that the character is at the correct z-index.
 	z_index = gridIndex.y + 1
 	
@@ -59,25 +63,14 @@ func _process(delta):
 	scale.x = scaleFactor
 	scale.y = scaleFactor
 	
-	# If player is in the movement phase, determine the player's target position
-	if parent.currentAction == "movement" || parent.currentAction == "processing": movementHandler()
+	# BELOW MAY OR MAY NOT CHANGE ONCE ENEMY AI IS DEVELOPED
+	if parent.currentAction == "movement": movementHandler()
 
-# This function is used to figure out where the player sprite should be 
+# This function is used to figure out where the enemy sprite should be.
+# All of the code is the same as in PlayerCharacter.gd unless otherwise noted.
 func movementHandler():
-	# First, determine the target yPosition, and assign newPosition.y accordingly.
-	# We USED to get the raw y-position of the cell and add 32, so that the character would be 
-	# aligned to the *middle* of the cell...
-	# ...but that doesn't work since I changed how y-scaling works.
-	# This Just Works™ so don't worry about it.
 	newPosition.y = (0.75 * parent.map_to_world(gridIndex).y) + 100
 	
-	# X-position is trickier, due to the distortion/perspective of the grid.
-	# I tried a bunch of Math Ways to figure this out, but it never quite worked...
-	# ...So we're going to just assign it based on the individual cell.
-	
-	### NOTE: All of these THEORETICALLY use consistent formulae, but I couldn't get that working.
-	### If we can streamline this to an cell-x-index check and the formulae themselves, we should!
-	### ...But we can figure that out later.
 	match gridIndex:
 		Vector2(0, 0): newPosition.x = 320 # 320 - y * 17.2
 		Vector2(1, 0): newPosition.x = 384 # 384 - y * 11.2
@@ -121,10 +114,6 @@ func movementHandler():
 		Vector2(4, 5): newPosition.x = 628
 		Vector2(5, 5): newPosition.x = 726
 	
-	# Anyway! Now that the new position has been calculated...
-	# Adjust the object's ACTUAL position to match.
-	# Tweens don't work here because those are for *animation frames.*
-	# That means, for smooth movement, we need to calculate velocity instead.
 	var xDifference = newPosition.x - position.x
 	var yDifference = newPosition.y - position.y
 	
@@ -135,6 +124,61 @@ func movementHandler():
 	else: velocity.y = yDifference / 5
 		
 	position += Vector2(velocity.x, velocity.y)
+
+# AI-only function: Check this enemy's "special" skills (supports + 'weird' attacks) to see if any should be used.
+# All specific behavior will be defined per specific enemy. As such, the generic one will always return false.
+func ai_specialSkillReview(charlist):
+	print("Enemy has no special skills.")
+	return false
+
+# AI-only function: Check this enemy's regular attacks to see if any can be used.
+# Always return the first match; attacks can be prioritized by reordering the array.
+func ai_regAttackReview(charlist):
+	var targetCharacter = false
+	
+	# Loop through every regular attack this enemy has, in order.
+	for attack in attackList:
+		# Loop through every tile that this attack can target.
+		for targetableTile in attack.abilityRange:
+			# Is there an enemy there? If so, and they're the first valid target - or they're a "better" target
+			# than anyone else - set them as targetCharacter.
+			# (By default, the enemy will target the weakest PC, but this can be changed - e.g. to make a specific
+			# character an undesirable target.)
+			for character in charlist:
+				if not targetCharacter:
+					if not character.isEnemy && character.gridIndex == gridIndex + targetableTile:
+						targetCharacter = character
+				elif targetCharacter.currHP < character.currHP:
+					if not character.isEnemy && character.gridIndex == gridIndex + targetableTile:
+						targetCharacter = character
+		# If a valid target has been found, return them along with the attack that should be used.
+		# Otherwise, proceed with the loop.
+		if targetCharacter: return [attack, targetCharacter]
+	
+	# If we exit the loop without a valid target found for any attack, return false.
+	return false
+
+func ai_whereToMove(charlist):
+	# First off: Which PC IS the closest?
+	var targetCharacter = false
+	
+	for character in charlist:
+		# First, target the first PC in the list.
+		if not targetCharacter && not character.isEnemy: targetCharacter = character
+		# Compare with subsequent PCs to see who's CLOSEST.
+		elif (abs(gridIndex.x + gridIndex.y - character.gridIndex.x - character.gridIndex.y) 
+			> abs(gridIndex.x + gridIndex.y - targetCharacter.gridIndex.y - targetCharacter.gridIndex.y) &&
+			not character.isEnemy):
+				targetCharacter = character
+				
+	# We've found who to "anchor" movement to, now figure out the best way to get closer.
+	# 1. Are they closer horizontally, or vertically? 2. What direction are they in?
+	if abs(gridIndex.x - targetCharacter.gridIndex.x) > abs(gridIndex.y - targetCharacter.gridIndex.y):
+		if gridIndex.x > targetCharacter.gridIndex.x: gridIndex.x -= 1
+		else: gridIndex.x += 1
+	else:
+		if gridIndex.y > targetCharacter.gridIndex.y: gridIndex.y -= 1
+		else: gridIndex.y +=1
 
 func playAnim(animName):
 	$AnimatedSprite.play(animName)

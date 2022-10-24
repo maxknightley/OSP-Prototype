@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Overworld_Baqi.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Level.gd" type="Script" id=2]
@@ -7,8 +7,37 @@
 [ext_resource path="res://TestFloor.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Assets/Music/Combat Theme 1 - Bleed Red.ogg" type="AudioStream" id=6]
 
+[sub_resource type="Animation" id=1]
+resource_name = "FadeToBlack"
+length = 1.55
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/FadeOutRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1.25, 1.55 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0.121196, 0.0760193, 0.207031, 0 ), Color( 0.121569, 0.0745098, 0.207843, 1 ), Color( 0.121569, 0.0745098, 0.207843, 1 ) ]
+}
+
 [node name="Level" type="Node2D"]
 script = ExtResource( 2 )
+
+[node name="FadeOutSuperFG" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FadeOutSuperFG"]
+anims/FadeToBlack = SubResource( 1 )
+
+[node name="FadeOutRect" type="ColorRect" parent="FadeOutSuperFG/AnimationPlayer"]
+margin_left = -74.0
+margin_top = -47.0
+margin_right = 1092.0
+margin_bottom = 832.0
+color = Color( 0.121196, 0.0760193, 0.207031, 0 )
 
 [node name="Sign" parent="." instance=ExtResource( 3 )]
 position = Vector2( 818, 696 )
