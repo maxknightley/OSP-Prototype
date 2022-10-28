@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Overworld_Baqi.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Level.gd" type="Script" id=2]
@@ -23,6 +23,22 @@ tracks/0/keys = {
 "values": [ Color( 0.121196, 0.0760193, 0.207031, 0 ), Color( 0.121569, 0.0745098, 0.207843, 1 ), Color( 0.121569, 0.0745098, 0.207843, 1 ) ]
 }
 
+[sub_resource type="Animation" id=2]
+resource_name = "FadeToWhite"
+length = 1.55
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/FadeOutRect:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1.25, 1.55 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0.121196, 0.0760193, 0.207031, 0 ), Color( 0.815686, 0.772549, 0.890196, 1 ), Color( 0.933333, 0.921569, 0.960784, 1 ) ]
+}
+
 [node name="Level" type="Node2D"]
 script = ExtResource( 2 )
 
@@ -31,6 +47,7 @@ layer = 10
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="FadeOutSuperFG"]
 anims/FadeToBlack = SubResource( 1 )
+anims/FadeToWhite = SubResource( 2 )
 
 [node name="FadeOutRect" type="ColorRect" parent="FadeOutSuperFG/AnimationPlayer"]
 margin_left = -74.0
@@ -56,6 +73,7 @@ position = Vector2( 522, 733 )
 
 [node name="CombatThemePlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 6 )
+volume_db = -5.0
 
 [connection signal="sendTextToDisplay" from="Sign" to="." method="_on_Sign_sendTextToDisplay"]
 [connection signal="timeout" from="DialogCooldown" to="." method="_on_DialogCooldown_timeout"]

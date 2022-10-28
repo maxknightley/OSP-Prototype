@@ -1,17 +1,166 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Assets/menu_theme.tres" type="Theme" id=1]
+[ext_resource path="res://Assets/baqi_placeholder_talksprite.png" type="Texture" id=2]
+
+[sub_resource type="Animation" id=1]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteLeftF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 172, 390 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "fade in hop LF"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteLeftF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.001, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 172, 415 ), Vector2( 172, 415 ), Vector2( 172, 360 ), Vector2( 172, 390 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("AnimationPlayer/TalkspriteLeftF:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "fade in hop RF"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteRightF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 847, 415 ), Vector2( 847, 360 ), Vector2( 847, 390 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("AnimationPlayer/TalkspriteRightF:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "hop LF"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteLeftF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 172, 390 ), Vector2( 172, 340 ), Vector2( 172, 390 ) ]
+}
+
+[sub_resource type="Animation" id=6]
+resource_name = "hop RF"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteRightF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 847, 390 ), Vector2( 847, 340 ), Vector2( 847, 390 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "slow fade in LF"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteLeftF:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=7]
+resource_name = "slow fade in RF"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimationPlayer/TalkspriteRightF:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
 
 [node name="DialogDisplay" type="Node2D"]
 position = Vector2( -1, 0 )
 
 [node name="TalkspritesFG" type="CanvasLayer" parent="."]
 
-[node name="TalkspriteLeftF" type="Sprite" parent="TalkspritesFG"]
-position = Vector2( 172, 390 )
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TalkspritesFG"]
+anims/RESET = SubResource( 1 )
+"anims/fade in hop LF" = SubResource( 2 )
+"anims/fade in hop RF" = SubResource( 5 )
+"anims/hop LF" = SubResource( 3 )
+"anims/hop RF" = SubResource( 6 )
+"anims/slow fade in LF" = SubResource( 4 )
+"anims/slow fade in RF" = SubResource( 7 )
 
-[node name="TalkspriteRightF" type="Sprite" parent="TalkspritesFG"]
+[node name="TalkspriteLeftF" type="Sprite" parent="TalkspritesFG/AnimationPlayer"]
+modulate = Color( 1, 1, 1, 0 )
+position = Vector2( 172, 390 )
+texture = ExtResource( 2 )
+
+[node name="TalkspriteRightF" type="Sprite" parent="TalkspritesFG/AnimationPlayer"]
+modulate = Color( 1, 1, 1, 0 )
 position = Vector2( 847, 390 )
+texture = ExtResource( 2 )
 
 [node name="DialogBox" type="CanvasLayer" parent="."]
 

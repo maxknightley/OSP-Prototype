@@ -66,8 +66,8 @@ func dialogHandler():
 		$DialogDisplay/DialogBox/RichTextLabel.text = ""
 		$DialogDisplay/SpeakerNameBox.hide()
 		$DialogDisplay/SpeakerNameBox/RichTextLabel.text = ""
-		$DialogDisplay/TalkspritesFG/TalkspriteRightF.hide()
-		$DialogDisplay/TalkspritesFG/TalkspriteLeftF.hide()
+		$DialogDisplay/TalkspritesFG/AnimationPlayer/TalkspriteRightF.hide()
+		$DialogDisplay/TalkspritesFG/AnimationPlayer/TalkspriteLeftF.hide()
 		
 		$OW_Leader.canMove = true
 		$DialogCooldown.start()
@@ -90,11 +90,56 @@ func dialogHandler():
 		# And next, if there's a talksprite, let's update that!
 		match activeText[lineIndex][3]:
 			"RF":
-				$DialogDisplay/TalkspritesFG/TalkspriteRightF.texture = load(activeText[lineIndex][2])
-				$DialogDisplay/TalkspritesFG/TalkspriteRightF.show()
+				var tsprite = $DialogDisplay/TalkspritesFG/AnimationPlayer/TalkspriteRightF
+				
+				match activeText[lineIndex][4]:
+					"fade in hop":
+						tsprite.texture = load(activeText[lineIndex][2])
+						tsprite.modulate.a = 0.0
+						tsprite.show()
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("fade in hop RF")
+						return
+					"fade in":
+						tsprite.texture = load(activeText[lineIndex][2])
+						tsprite.modulate.a = 0.0
+						tsprite.show()
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("slow fade in RF")
+						return
+					"hop":
+						tsprite.texture = load(activeText[lineIndex][2])
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("hop RF")
+						return
+				
+				# If no other animation was called, just make sure we're displaying the talksprite.
+				tsprite.texture = load(activeText[lineIndex][2])
+				tsprite.modulate.a = 1.0
+				tsprite.show()
 			"LF":
-				$DialogDisplay/TalkspritesFG/TalkspriteLeftF.texture = load(activeText[lineIndex][2])
-				$DialogDisplay/TalkspritesFG/TalkspriteLeftF.show()
+				var tsprite = $DialogDisplay/TalkspritesFG/AnimationPlayer/TalkspriteLeftF
+				
+				match activeText[lineIndex][4]:
+					"fade in hop":
+						tsprite.texture = load(activeText[lineIndex][2])
+						tsprite.modulate.a = 0.0
+						tsprite.show()
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("fade in hop LF")
+						return
+					"fade in":
+						tsprite.texture = load(activeText[lineIndex][2])
+						tsprite.modulate.a = 0.0
+						tsprite.show()
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("slow fade in LF")
+						return
+					"hop":
+						tsprite.texture = load(activeText[lineIndex][2])
+						tsprite.show()
+						$DialogDisplay/TalkspritesFG/AnimationPlayer.play("hop LF")
+						return
+				
+				# If no other animation was called, just make sure we're displaying the talksprite.
+				tsprite.texture = load(activeText[lineIndex][2])
+				tsprite.modulate.a = 1.0
+				tsprite.show()
 
 func _on_DialogCooldown_timeout():
 	isReading = false
@@ -104,13 +149,19 @@ func _on_DialogCooldown_timeout():
 func runDialogAction():
 	if dialogAction == "test battle":
 		initiateBattle(load("res://ExampleBattle.tscn").instance(), $CombatThemePlayer,
-			[["Baqi", "Alright. Combat has been TESTED. And yet...", "res://Assets/baqi_placeholder_talksprite.png", "LF"],
-			["Baqi", "My sword still hungers...", false, false]])
+			[["Baqi", "Alright. Combat has been TESTED. And yet...", "res://Assets/baqi_placeholder_talksprite.png", "LF", "false"],
+			["Baqi", "My sword still hungers...", false, false, "hop"]])
 
 # When called, hide + deactivate everything in the overworld and begin the selected battle.
 func initiateBattle(battleScene, bAudioStream, battleCompletionText):
-	$Sign.hide()
 	$Sign.active = false
+	
+	$FadeOutSuperFG/AnimationPlayer.play("FadeToWhite")
+	yield($FadeOutSuperFG/AnimationPlayer, "animation_finished")
+	$FadeOutSuperFG/AnimationPlayer.play_backwards("FadeToWhite")
+	
+	$Sign.hide()
+	$Sign/AnimatedSprite.play("default")
 	$OW_Leader.hide()
 	$OW_Leader.canMove = false
 	$TestFloor.hide()
